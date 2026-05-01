@@ -1,0 +1,25 @@
+# =============================================================================
+# docker-compose.yml — orquesta el contenedor de la app y persistencia local.
+# =============================================================================
+# Uso:
+#     docker compose up --build
+#
+# Esto levanta la API en http://localhost:8000 y persiste los embeddings
+# en ./chroma_db (mapeado al volumen del contenedor).
+# =============================================================================
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      # Persistimos la base vectorial fuera del contenedor.
+      - ./chroma_db:/app/chroma_db
+      # Acceso a documentos crudos (opcional).
+      - ./data:/app/data
+    restart: unless-stopped
+
+# NOTA: Cuando despliegues en AWS ECS Fargate, NO usas docker-compose;
+# usas un task definition equivalente (CPU, mem, env, secrets, log group).
