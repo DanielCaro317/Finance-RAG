@@ -10,7 +10,7 @@ La búsqueda vectorial captura SIGNIFICADO, pero a veces falla con:
 
 La búsqueda LÉXICA (BM25, basada en frecuencias de palabras) brilla
 exactamente donde la vectorial flaquea. Combinarlas (HÍBRIDA) suele dar
-+5–15% en recall, según experiencia de la masterclass.
+una mejora sustancial en recall sobre corpus de dominio.
 
 EL RERANKER:
   Tras recuperar TOP-K candidatos, un segundo modelo (cross-encoder o LLM)

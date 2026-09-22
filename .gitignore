@@ -24,3 +24,6 @@ data/processed/
 # OS
 .DS_Store
 Thumbs.db
+
+# Material de trabajo local (no forma parte del proyecto)
+CURSO_PASO_A_PASO.md

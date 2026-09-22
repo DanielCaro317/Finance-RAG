@@ -1,19 +1,15 @@
-# ☁️ Curso AWS Cloud-Native: Asistente RAG 100% en la nube
+# Despliegue en AWS — arquitectura cloud-native
 
-> **Propósito**: replicar el proyecto **completamente en AWS**, usando
-> servicios gestionados siempre que sea posible. Al terminar serás
-> capaz de diseñar, desplegar y operar un sistema RAG corporativo en
-> AWS con buenas prácticas Well-Architected.
+> Replicación del sistema **completamente en AWS**, apoyada en servicios
+> gestionados siempre que es posible, siguiendo el Well-Architected Framework.
+> Cubre el mapeo componente a componente desde la versión local, las decisiones
+> de arquitectura en cada capa y su costo asociado.
 
-> **Pre-requisitos**:
-> - Haber completado el [CURSO_PASO_A_PASO.md](CURSO_PASO_A_PASO.md) o entender el proyecto local.
-> - Cuenta AWS activa (Free Tier sirve para casi todo).
-> - Tarjeta de crédito asociada (algunos servicios cobran centavos).
-> - AWS CLI v2 instalado.
+> **Requisitos**: comprensión del [sistema local](./arquitectura.md), cuenta AWS
+> activa (el Free Tier cubre casi todo) y AWS CLI v2.
 
-> **Tiempo estimado**: 8-15 horas. Algunos servicios tardan minutos en aprovisionarse.
-
-> **Costo estimado del curso**: USD 5–30 si destruyes recursos al terminar cada módulo. USD 100+ al mes si dejas todo encendido.
+> **Costo**: USD 5–30 si los recursos se destruyen al terminar cada módulo;
+> por encima de USD 100 al mes si la infraestructura queda encendida.
 
 ---
 
@@ -106,7 +102,7 @@ aws configure --profile rag-admin
 ```
 
 > ⚠️ Las credenciales `ASIA...` (con session token) que tienes en `.env`
-> son **temporales**. Para el curso conviene un usuario IAM permanente.
+> son **temporales**. Para trabajo sostenido conviene un usuario IAM permanente.
 
 ### C0.5 — Verificar
 ```bash
@@ -127,12 +123,12 @@ $env:AWS_PROFILE="rag-admin"            # Windows PowerShell
 2. Tipo "Cost budget", $10/mes.
 3. Notify a tu email cuando supere 80% del presupuesto.
 
-## ✅ Checkpoint
+## Verificación
 - `aws sts get-caller-identity` funciona.
 - Tu cuenta tiene un budget alert configurado.
 - MFA activado en root.
 
-## 🧠 Consejo
+## Nota operativa
 > Crea un alias en tu shell: `alias awsr="aws --profile rag-admin"`. Te
 > ahorra teclear el perfil en cada comando.
 
@@ -269,7 +265,7 @@ Tu `app/services/s3_service.py` ya soporta uploads — al ingerir con
 - Glacier Deep Archive: ~$0.001/GB/mes.
 - 10GB de docs en Standard ≈ $0.23/mes.
 
-## 🧠 Consejo
+## Nota operativa
 > NUNCA pongas el nombre del bucket en el código. Siempre vía Settings.
 > Y en producción, usa **bucket policies** restrictivas (solo el rol de
 > ECS puede leer/escribir).
@@ -336,7 +332,7 @@ aws ssm put-parameter --name /rag/llm-model --value "gpt-4o-mini" --type String
 aws ssm put-parameter --name /rag/retrieval-top-k --value "10" --type String
 ```
 
-## 🧠 Consejo
+## Nota operativa
 > Rota los secretos cada 90 días automáticamente. Secrets Manager lo
 > hace solo si configuras una Lambda de rotación.
 
@@ -397,7 +393,7 @@ print(json.loads(resp["body"].read())["content"][0]["text"])
 
 Una conversación RAG corta (≤2K tokens in + 500 out) con Haiku ≈ $0.001.
 
-## 🧠 Consejo
+## Nota operativa
 > Empieza con **Claude 3 Haiku** + **Cohere Embed Multilingual**. Es la
 > combinación barata-y-buena para español. Sube a Sonnet solo si Haiku
 > falla calidad-mente.
@@ -447,7 +443,7 @@ rm -rf chroma_db/
 python -m scripts.ingest_documents data/raw/ --domain general
 ```
 
-## 🧠 Consejo
+## Nota operativa
 > Cohere Embed Multilingual se entrenó con español, francés, alemán,
 > chino, etc. Para banca latinoamericana, **superior a Titan en ES**.
 
@@ -484,7 +480,7 @@ distribuyen carga entre regiones:
 modelId="us.anthropic.claude-3-5-sonnet-20241022-v2:0"  # prefijo "us."
 ```
 
-## 🧠 Consejo
+## Nota operativa
 > Bedrock cobra por token IN y OUT. Optimiza el system prompt — cada
 > token de prompt × cada llamada × cada usuario = $$$. Manténlo conciso.
 
@@ -626,7 +622,7 @@ body = {
 client.search(index="rag-vectors", body=body)
 ```
 
-## 🧠 Consejo
+## Nota operativa
 > Si tu volumen es bajo (<1M chunks), **Aurora pgvector** es 10x más
 > barato. OpenSearch Serverless brilla con escala alta o necesidad de
 > BM25 nativo.
@@ -726,7 +722,7 @@ class PgvectorStore:
 - 0.5 ACU × 24h × 30d × $0.12 = ~$43/mes mínimo.
 - Storage: $0.10/GB/mes.
 
-## 🧠 Consejo
+## Nota operativa
 > El operador `<=>` es distancia coseno en pgvector. `<->` es L2,
 > `<#>` es producto interno (negativo). Para texto SIEMPRE coseno.
 
@@ -798,7 +794,7 @@ Configura un **EventBridge rule** que dispare un Lambda que llame
 - Filtros de metadata complejos (RBAC).
 - Quieres optimizar costo o tener control total.
 
-## 🧠 Consejo
+## Nota operativa
 > Aún si vas a construir a mano, **prueba KB primero** con tus docs y
 > compara métricas. A veces la solución managed gana.
 
@@ -895,7 +891,7 @@ for ev in resp["completion"]:
 | Personalización | Limitada | Total |
 | Costo | + por sesión | Solo tokens |
 
-## 🧠 Consejo
+## Nota operativa
 > Bedrock Agents está madurando rápido. Si tu caso es simple, te
 > ahorra meses de trabajo.
 
@@ -956,7 +952,7 @@ aws ecr put-lifecycle-policy --repository-name asistente-rag --lifecycle-policy-
 ## Costos
 $0.10/GB/mes de almacenamiento. Una imagen ~500MB = $0.05/mes.
 
-## 🧠 Consejo
+## Nota operativa
 > Tagea con SHA del commit (`asistente-rag:abc1234`) además de `latest`.
 > Así puedes hacer rollback exacto.
 
@@ -1109,7 +1105,7 @@ aws application-autoscaling put-scaling-policy \
 - 1 vCPU + 2GB RAM Fargate × 24h × 30d ≈ $30/mes.
 - Egress: $0.09/GB de salida.
 
-## 🧠 Consejo
+## Nota operativa
 > Empieza con 1 vCPU / 2GB. Si el LLM no es local (Bedrock), el
 > contenedor solo orquesta — no necesitas mucho.
 
@@ -1186,7 +1182,7 @@ curl https://asistente-rag.midominio.com/health
 ## Costos ALB
 $0.0225/hora + $0.008/LCU-hora ≈ $20/mes baseline.
 
-## 🧠 Consejo
+## Nota operativa
 > Activa **WAF** (~$5/mes) en producción para protegerte de SQL
 > injection, prompt injection patterns conocidos, rate limit por IP.
 
@@ -1257,7 +1253,7 @@ where = {"allowed_groups": {"$in": user.get("cognito:groups", [])}}
 chunks = retriever.retrieve(query, top_k=10, where=where)
 ```
 
-## 🧠 Consejo
+## Nota operativa
 > Para apps internas: configura Cognito con **federación SSO** (SAML)
 > contra el AD/Okta de la empresa. Single sign-on real.
 
@@ -1355,7 +1351,7 @@ aws s3 cp mi_doc.pdf s3://mi-banco-rag-docs/raw/fraude/mi_doc.pdf
 aws logs tail /aws/lambda/rag-ingest-worker --follow
 ```
 
-## 🧠 Consejo
+## Nota operativa
 > Pon `VisibilityTimeout > Lambda timeout`. Si Lambda tarda 5min,
 > el visibility timeout debe ser ≥6min. Si no, SQS reintenta antes
 > de que termine la primera ejecución → procesas duplicado.
@@ -1412,7 +1408,7 @@ indexa → notifica". Si un paso falla, retry, sino DLQ.
 }
 ```
 
-## 🧠 Consejo
+## Nota operativa
 > Step Functions Express ($1/M ejecuciones) para pipelines ≤5min. Standard
 > para procesos largos (hasta 1 año!) con histórico completo. Para nuestro
 > RAG → Express.
@@ -1483,7 +1479,7 @@ def _read_pdf_textract(s3_key: str) -> str:
 $0.0015/página `DetectDocumentText`, $0.05/página `AnalyzeDocument`. Un
 manual de 100 páginas = $0.15-$5 según features.
 
-## 🧠 Consejo
+## Nota operativa
 > Para PDFs simples nativos (no escaneados, sin tablas), `pypdf` es
 > gratis y rápido. Reserva Textract para los complicados.
 
@@ -1558,7 +1554,7 @@ app.add_middleware(XRayMiddleware, recorder=xray_recorder)
 3. Run xray daemon como sidecar en la task ECS.
 4. Ver mapas en Console → X-Ray.
 
-## 🧠 Consejo
+## Nota operativa
 > Crea **un dashboard** en CloudWatch con: req/min, p99 latency, errors,
 > tokens/día, costo estimado. Lo abres una vez al día como termómetro.
 
@@ -1736,7 +1732,7 @@ cdk deploy     # aplica
 cdk destroy
 ```
 
-## 🧠 Consejo
+## Nota operativa
 > Después del primer deploy, **deja todo en CDK** y nunca más toques
 > nada por consola/CLI. Lo que se hace fuera de IaC se llama "drift" y
 > te muerde el día menos pensado.
@@ -1806,7 +1802,7 @@ jobs:
 
 Beneficio: no tienes credenciales en GitHub Secrets. Cero rotación.
 
-## 🧠 Consejo
+## Nota operativa
 > Pon **branch protection** en `main`: requiere PR review + CI pasando
 > antes de mergear. Tu pipeline se vuelve la única ruta a producción.
 
@@ -1860,7 +1856,7 @@ aws budgets create-budget --account-id <ACCT> --budget '{
 }]'
 ```
 
-## 🧠 Consejo
+## Nota operativa
 > Etiqueta TODOS los recursos con `tag:Project=rag`. Cost Explorer te
 > deja filtrar por tag y ver cuánto te cuesta el proyecto al céntimo.
 
@@ -1908,7 +1904,7 @@ AWS Well-Architected Framework: 6 pilares. Aplicado a nuestro RAG:
 - ✅ Fargate (pagas por uso, no idle).
 - ⚠️ Region selection: regiones con energía renovable (ej. eu-west-3).
 
-## 🧠 Consejo
+## Nota operativa
 > Cada 6 meses, revisa los 6 pilares. Anota dónde estás verde, amarillo,
 > rojo. Prioriza los rojos en el siguiente quarter.
 
@@ -1993,7 +1989,7 @@ aws ce get-cost-and-usage \
 
 Tu factura de mañana debería ser ~$0.
 
-## 🧠 Consejo
+## Nota operativa
 > Después de cada sesión de práctica, ejecuta `cdk destroy`. Mañana
 > recreas con `cdk deploy` en 5 minutos. **No pagues por aprender mientras duermes.**
 
@@ -2058,17 +2054,16 @@ geolocalizaciones de alto riesgo.
 Integra X-Ray, CloudWatch Logs Insights queries guardadas, alarmas
 en SNS → email + Slack. Documenta runbooks por alarma.
 
-## ✅ Criterio de aprobación
+## Qué queda cubierto
 
-Si después de este curso:
-- Puedes diseñar la arquitectura cloud de un nuevo caso de uso RAG en una pizarra.
-- Sabes los costos aproximados de cada componente.
-- Puedes argumentar por qué eliges X sobre Y en cada capa.
-- Sabes cómo desplegar y limpiar todo con un comando.
-- Puedes hablar fluidamente del Well-Architected Framework.
+- La arquitectura cloud de un caso de uso RAG, diseñable desde cero.
+- El costo aproximado de cada componente.
+- El criterio para elegir entre alternativas en cada capa.
+- El despliegue y el desmontaje completos con un comando.
+- La lectura del sistema según el Well-Architected Framework.
 
-**Eres un AWS RAG Solutions Architect**. Vale como tema de conversación
-en entrevistas y como diferencial en propuestas a clientes.
+Con eso, la arquitectura queda cubierta de extremo a extremo: diseño,
+despliegue, operación, costos y desmontaje.
 
 ---
 
@@ -2100,8 +2095,6 @@ Has cubierto:
 El paso final no está en este documento: **constrúyelo en TU caso real**
 con TUS documentos y TUS preguntas. Mide. Itera. Optimiza costos.
 
-> **Recuerda**: la nube no es magia, es **operación**. La diferencia
-> entre un sistema que funciona el día 1 y uno que funciona el día 365
-> es la disciplina de monitorear, medir y optimizar continuamente.
-
-**Felicidades. Ahora ve a operar.** ☁️🚀
+> La nube no es magia, es **operación**. La diferencia entre un sistema que
+> funciona el día 1 y uno que sigue funcionando el día 365 está en la disciplina
+> de monitorear, medir y optimizar de forma continua.

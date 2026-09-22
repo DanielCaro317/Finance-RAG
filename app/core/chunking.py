@@ -1,8 +1,8 @@
 """
 core/chunking.py — Estrategias de fragmentación (chunking).
 
-¿QUÉ ES "CHUNKING" Y POR QUÉ IMPORTA TANTO? (lección clave del Masterclass)
-==========================================================================
+¿QUÉ ES "CHUNKING" Y POR QUÉ IMPORTA TANTO?
+===========================================
 Los LLMs tienen ventana de contexto limitada y los embeddings funcionan mejor
 sobre fragmentos cortos y semánticamente cohesivos. Por eso PARTIMOS los
 documentos en "chunks". Pero NO sirve cualquier corte:

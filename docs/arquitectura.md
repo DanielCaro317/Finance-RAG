@@ -1,17 +1,17 @@
-# 📚 Guía Completa — Asistente Cognitivo Financiero (RAG desde cero)
+# Arquitectura y operación
 
-> Esta guía explica **todo** lo que se hizo en el proyecto, paso a paso,
-> con la teoría detrás de cada decisión y las variaciones posibles.
-> Está pensada para alguien que **nunca ha hecho RAG**.
+> Documento de referencia del sistema: qué compone cada capa, la razón
+> técnica detrás de cada decisión, cómo ejecutarlo, cómo probarlo y cómo
+> evaluarlo. Incluye las variantes consideradas y descartadas.
 
 ---
 
 ## Tabla de contenido
 
 1. [¿Qué construimos y por qué?](#1-qué-construimos-y-por-qué)
-2. [Conceptos fundamentales (glosario en pasos)](#2-conceptos-fundamentales)
+2. [Conceptos fundamentales (glosario)](#2-conceptos-fundamentales)
 3. [Arquitectura general](#3-arquitectura-general)
-4. [Paso a paso de lo que hicimos](#4-paso-a-paso-de-lo-que-hicimos)
+4. [Construcción del sistema, capa por capa](#4-construcción-del-sistema-capa-por-capa)
 5. [Cómo ejecutar el sistema localmente](#5-cómo-ejecutar-el-sistema-localmente)
 6. [Cómo probarlo manualmente (curl, Swagger, n8n)](#6-cómo-probarlo-manualmente)
 7. [Cómo evaluarlo con Ragas](#7-cómo-evaluar-con-ragas)
@@ -90,7 +90,7 @@ Usuario / n8n  ──HTTP──►  FastAPI  ──►  Agent  ──┬──�
 
 ---
 
-## 4. Paso a paso de lo que hicimos
+## 4. Construcción del sistema, capa por capa
 
 ### 4.1 — Plantilla de configuración (`config.py`, `.env`)
 
@@ -562,7 +562,7 @@ asistente_cognitivo_financiero/
 ├── docker-compose.yml                # Levanta el stack local
 ├── requirements.txt                  # Deps Python
 ├── README.md                         # Quick start
-├── GUIA_COMPLETA.md                  # ← Este archivo
+├── docs/arquitectura.md              # ← Este documento
 ├── data/raw/manual_fraude_v2.md      # Documento de ejemplo
 ├── app/
 │   ├── main.py                       # FastAPI bootstrap
@@ -595,9 +595,9 @@ asistente_cognitivo_financiero/
 
 ---
 
-## 🎯 Checklist mental para entender RAG
+## Principios de diseño que sostienen el sistema
 
-Si entiendes ESTOS 7 puntos, entiendes RAG:
+Las siete decisiones que más determinan la calidad del resultado:
 
 1. **Por qué chunking** importa más que el modelo de embeddings.
 2. **Por qué la búsqueda híbrida** supera a la pura vectorial.
@@ -609,5 +609,5 @@ Si entiendes ESTOS 7 puntos, entiendes RAG:
 
 ---
 
-**Felicidades** 🎉 — tienes un Agente RAG corporativo funcional, modular,
-auditable y desplegable. Empieza pequeño, mide siempre, itera con datos.
+El resultado es un agente RAG corporativo modular, auditable y desplegable,
+con la evaluación integrada desde el inicio en lugar de añadida al final.
